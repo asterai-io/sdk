@@ -22,7 +22,7 @@ $ npm install -g @asterai/cli
 $ asterai COMMAND
 running command...
 $ asterai (--version)
-@asterai/cli/0.3.0 linux-x64 node-v20.12.2
+@asterai/cli/0.3.1 linux-x64 node-v20.12.2
 $ asterai --help [COMMAND]
 USAGE
   $ asterai COMMAND
@@ -57,7 +57,7 @@ EXAMPLES
   $ asterai auth
 ```
 
-_See code: [src/commands/auth.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.3.0/src/commands/auth.ts)_
+_See code: [src/commands/auth.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.3.1/src/commands/auth.ts)_
 
 ## `asterai build [INPUT]`
 
@@ -77,7 +77,7 @@ EXAMPLES
   $ asterai build
 ```
 
-_See code: [src/commands/build.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.3.0/src/commands/build.ts)_
+_See code: [src/commands/build.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.3.1/src/commands/build.ts)_
 
 ## `asterai codegen`
 
@@ -85,11 +85,14 @@ Generate code from the plugin manifest
 
 ```
 USAGE
-  $ asterai codegen [-m <value>] [-o <value>]
+  $ asterai codegen [-m <value>] [-o <value>] [-a <value>] [-l <value>] [-s]
 
 FLAGS
+  -a, --appId=<value>      app id
+  -l, --language=<value>   [default: js] language of generated typings
   -m, --manifest=<value>   [default: plugin.asterai.proto] manifest path
   -o, --outputDir=<value>  [default: generated] output directory
+  -s, --staging            use staging endpoint
 
 DESCRIPTION
   Generate code from the plugin manifest
@@ -98,7 +101,7 @@ EXAMPLES
   $ asterai codegen
 ```
 
-_See code: [src/commands/codegen.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.3.0/src/commands/codegen.ts)_
+_See code: [src/commands/codegen.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.3.1/src/commands/codegen.ts)_
 
 ## `asterai deploy [INPUT]`
 
@@ -121,7 +124,7 @@ EXAMPLES
   $ asterai deploy --app 66a46b12-b1a7-4b72-a64a-0e4fe21902b6
 ```
 
-_See code: [src/commands/deploy.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.3.0/src/commands/deploy.ts)_
+_See code: [src/commands/deploy.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.3.1/src/commands/deploy.ts)_
 
 ## `asterai help [COMMAND]`
 
@@ -158,6 +161,6 @@ EXAMPLES
   $ asterai init project-name
 ```
 
-_See code: [src/commands/init.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.3.0/src/commands/init.ts)_
+_See code: [src/commands/init.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.3.1/src/commands/init.ts)_
 
 <!-- commandsstop -->
