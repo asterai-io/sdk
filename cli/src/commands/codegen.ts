@@ -80,13 +80,12 @@ export const codegen = (flags: CodegenFlags) => {
     );
   }
 
-  return generateAssemblyScriptPluginTypings(outDir, baseDir, manifestPath);
+  return generateAssemblyScriptPluginTypings(flags, baseDir);
 };
 
 const generateAssemblyScriptPluginTypings = async (
-  outDir: string,
+  flags: CodegenFlags,
   baseDir: string,
-  manifestPath: string,
 ) => {
   const absoluteAsProtoGenPath = path.join(baseDir, AS_PROTO_GEN_PATH);
   try {
@@ -104,7 +103,7 @@ const generateAssemblyScriptPluginTypings = async (
       "protoc " +
         `--plugin='protoc-gen-as=${absoluteAsProtoGenPath}' ` +
         `--experimental_allow_proto3_optional ` +
-        `--as_out='./${outDir}' ./${manifestPath}`,
+        `--as_out='./${flags.outputDir}' ./${flags.manifest}`,
     );
   } catch (e) {
     console.error("Failed to generate protobuf types:", e);
@@ -133,42 +132,60 @@ const generateClientTypings = async (
     appId,
     shouldUseStaging,
   );
-  fs.writeFileSync(
-    path.join(outDir, "manifests.json"),
-    JSON.stringify(manifestsResponse, null, 2),
+  const asteraiProto = await fetchAsteraiProto();
+  const aggregatedManifest = aggregateManifests(
+    manifestsResponse.manifests,
+    asteraiProto,
   );
-  console.log("manifests.json generated successfully.");
-
+  const appPrefix = `app.${appId}`;
+  fs.writeFileSync(
+    path.join(outDir, `${appPrefix}.proto`),
+    aggregatedManifest.content,
+  );
   if (language === "ts") {
-    const aggregatedManifestPath = aggregateManifests(
-      manifestsResponse.manifests,
-    );
-
+    console.log("generating TypeScript typings for plugin manifest...");
+    const jsOutput = `${appPrefix}.js`;
+    const dTsOutput = `${appPrefix}.d.ts`;
     execSync(`
-      npx -p protobufjs-cli pbjs -t static --no-service ${aggregatedManifestPath} -o ${path.join(outDir, "plugins.asterai.js")}
+      npx -p protobufjs-cli pbjs -t static --no-service ${aggregatedManifest.filePath} -o ${path.join(outDir, jsOutput)}
     `);
     execSync(`
-      npx -p protobufjs-cli pbts -o ${path.join(outDir, "plugins.asterai.d.ts")} ${path.join(outDir, "plugins.asterai.js")}
+      npx -p protobufjs-cli pbts -o ${path.join(outDir, dTsOutput)} ${path.join(outDir, jsOutput)}
     `);
 
-    fs.unlinkSync(aggregatedManifestPath);
+    fs.unlinkSync(aggregatedManifest.filePath);
     console.log("Typings generated successfully.");
   }
+  console.log("done.");
 };
 
-const aggregateManifests = (manifests: ExportedManifest[]) => {
-  let aggregatedManifest = `
-  syntax = 'proto3';
-  \n
-`;
+const fetchAsteraiProto = (): Promise<string> => {
+  // TODO: fetch this from the local file system instead.
+  return axios
+    .get<string>("https://unpkg.com/@asterai/sdk@latest/protobuf/asterai.proto")
+    .then(r => r.data);
+};
 
+type AggregatedManifests = {
+  content: string;
+  filePath: string;
+};
+
+const aggregateManifests = (
+  manifests: ExportedManifest[],
+  asteraiProto: string,
+): AggregatedManifests => {
+  let aggregatedManifest = `${asteraiProto}\n`;
   const osTmpDir = os.tmpdir();
   const aggregatedManifestPath = path.join(osTmpDir, "plugins.asterai.proto");
   for (const manifest of manifests) {
     aggregatedManifest += `${manifest.proto}\n`;
   }
   fs.writeFileSync(aggregatedManifestPath, aggregatedManifest);
-  return aggregatedManifestPath;
+  return {
+    content: aggregatedManifest,
+    filePath: aggregatedManifestPath,
+  };
 };
 
 const downloadEnabledPluginsManifests = async (
