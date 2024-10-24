@@ -1,7 +1,7 @@
 {
   "name": "@asterai/cli",
   "description": "CLI for building and deploying asterai plugins",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "author": "asterai <support@asterai.io>",
   "repository": "asterai-io/asterai-sdk",
   "homepage": "https://github.com/asterai-io/asterai-sdk",
