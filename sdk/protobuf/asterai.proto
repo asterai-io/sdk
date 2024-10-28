@@ -11,6 +11,11 @@ message AppQuery {
   optional string user_id = 3;
 }
 
+message HostVectorEmbeddingStoreRequest {
+  string content = 1;
+  string app_collection_name = 2;
+}
+
 message HostVectorEmbeddingSearchRequest {
   string query = 1;
   string app_collection_name = 2;

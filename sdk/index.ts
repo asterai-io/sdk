@@ -12,10 +12,12 @@ import { HostKvSetUserStringRequest } from "./generated/HostKvSetUserStringReque
 import { HostPluginEnvGetStringRequest } from "./generated/HostPluginEnvGetStringRequest";
 import { HostPluginEnvGetStringResponse } from "./generated/HostPluginEnvGetStringResponse";
 import { decode, encode } from "as-base64/assembly";
+import { HostVectorEmbeddingStoreRequest } from "./generated/HostVectorEmbeddingStoreRequest";
 
 declare namespace host {
   export function log(request: u32): void;
   export function http_request(request: u32): u32;
+  export function vector_embedding_store(request: u32): void;
   export function vector_embedding_search(request: u32): u32;
   export function kv_get_user_string(request: u32): u32;
   export function kv_set_user_string(request: u32): void;
@@ -105,7 +107,10 @@ export class HttpRequestBuilder {
   }
 
   public basicAuth(username: string, password: string): HttpRequestBuilder {
-    this._headers.set("authorization", `Basic ${base64Encode(`${username}:${password}`)}`);
+    this._headers.set(
+      "authorization",
+      `Basic ${base64Encode(`${username}:${password}`)}`,
+    );
     return this;
   }
 
@@ -189,7 +194,7 @@ export class HttpRequestBuilder {
 }
 
 export enum HttpFormEncoding {
-  UrlEncoded
+  UrlEncoded,
 }
 
 export class HttpForm {
@@ -203,7 +208,7 @@ export class HttpForm {
   public setField(key: string, value: string): void {
     this._formData.set(key, value);
   }
-  
+
   public renderBody(): string {
     let formData = "";
     const keys = this._formData.keys();
@@ -245,6 +250,15 @@ function isUrlSafe(c: string): boolean {
 }
 
 export class VectorEmbedding {
+  public static semanticStore(request: HostVectorEmbeddingStoreRequest): void {
+    const requestBytes = Protobuf.encode<HostVectorEmbeddingStoreRequest>(
+      request,
+      HostVectorEmbeddingStoreRequest.encode,
+    );
+    host.vector_embedding_store(writeBufferToPr(requestBytes));
+    return;
+  }
+
   public static semanticSearch(
     request: HostVectorEmbeddingSearchRequest,
   ): HostVectorEmbeddingSimilarityScore[] {
@@ -305,7 +319,7 @@ export function getEnv(key: string): string | null {
     readBufferFromPtr(responsePtr),
     HostPluginEnvGetStringResponse.decode,
   );
-  
+
   return response.value;
 }
 
