@@ -9,17 +9,15 @@ import { HostHttpResponse } from "./generated/HostHttpResponse";
 import { HostKvGetUserStringRequest } from "./generated/HostKvGetUserStringRequest";
 import { HostKvGetUserStringResponse } from "./generated/HostKvGetUserStringResponse";
 import { HostKvSetUserStringRequest } from "./generated/HostKvSetUserStringRequest";
-import { HostPluginEnvGetStringRequest } from "./generated/HostPluginEnvGetStringRequest";
-import { HostPluginEnvGetStringResponse } from "./generated/HostPluginEnvGetStringResponse";
-import { decode, encode } from "as-base64/assembly";
+import { HostVectorEmbeddingStoreRequest } from "./generated/HostVectorEmbeddingStoreRequest";
 
 declare namespace host {
   export function log(request: u32): void;
   export function http_request(request: u32): u32;
+  export function vector_embedding_store(request: u32): void;
   export function vector_embedding_search(request: u32): u32;
   export function kv_get_user_string(request: u32): u32;
   export function kv_set_user_string(request: u32): void;
-  export function plugin_env_get_string(request: u32): u32;
 }
 
 export class Log {
@@ -104,11 +102,6 @@ export class HttpRequestBuilder {
     return this;
   }
 
-  public basicAuth(username: string, password: string): HttpRequestBuilder {
-    this._headers.set("authorization", `Basic ${base64Encode(`${username}:${password}`)}`);
-    return this;
-  }
-
   public method(value: string): HttpRequestBuilder {
     this._method = value;
     return this;
@@ -121,11 +114,6 @@ export class HttpRequestBuilder {
 
   public body(value: string): HttpRequestBuilder {
     this._body = value;
-    return this;
-  }
-
-  public setForm(form: HttpForm): HttpRequestBuilder {
-    this._body = form.renderBody();
     return this;
   }
 
@@ -188,41 +176,12 @@ export class HttpRequestBuilder {
   }
 }
 
-export enum HttpFormEncoding {
-  UrlEncoded
-}
-
-export class HttpForm {
-  private _formData: Map<string, string> = new Map();
-  private _encoding: HttpFormEncoding;
-
-  public constructor(encoding: HttpFormEncoding) {
-    this._encoding = encoding;
-  }
-
-  public setField(key: string, value: string): void {
-    this._formData.set(key, value);
-  }
-  
-  public renderBody(): string {
-    let formData = "";
-    const keys = this._formData.keys();
-    const values = this._formData.values();
-    for (let i = 0; i < keys.length; i++) {
-      const value = encodeURIComponent(values[i]);
-      formData += `${keys[i]}=${value}&`;
-    }
-
-    return formData;
-  }
-}
-
 export function encodeUriComponent(input: string): string {
   let result: string = "";
 
   for (let i = 0; i < input.length; i++) {
     const c = input.charAt(i);
-    if (isUrlSafe(c)) {
+    if (isSafe(c)) {
       result += c;
     } else {
       result += "%" + c.charCodeAt(0).toString(16).toUpperCase();
@@ -232,7 +191,7 @@ export function encodeUriComponent(input: string): string {
   return result;
 }
 
-function isUrlSafe(c: string): boolean {
+function isSafe(c: string): boolean {
   return (
     (c >= "a" && c <= "z") ||
     (c >= "A" && c <= "Z") ||
@@ -245,6 +204,15 @@ function isUrlSafe(c: string): boolean {
 }
 
 export class VectorEmbedding {
+  public static semanticStore(request: HostVectorEmbeddingStoreRequest): void {
+    const requestBytes = Protobuf.encode<HostVectorEmbeddingStoreRequest>(
+      request,
+      HostVectorEmbeddingStoreRequest.encode,
+    );
+    host.vector_embedding_store(writeBufferToPr(requestBytes));
+    return;
+  }
+
   public static semanticSearch(
     request: HostVectorEmbeddingSearchRequest,
   ): HostVectorEmbeddingSimilarityScore[] {
@@ -285,42 +253,11 @@ export class UserKvStorage {
   }
 
   public setString(key: string, value: string | null): void {
-    const request = new HostKvSetUserStringRequest(this.userId, key, value);
+    const request = new HostKvSetUserStringRequest(this.userId, key);
     const requestBytes = Protobuf.encode<HostKvSetUserStringRequest>(
       request,
       HostKvSetUserStringRequest.encode,
     );
     host.kv_set_user_string(writeBufferToPr(requestBytes));
   }
-}
-
-export function getEnv(key: string): string | null {
-  const request = new HostPluginEnvGetStringRequest(key);
-  const requestBytes = Protobuf.encode<HostPluginEnvGetStringRequest>(
-    request,
-    HostPluginEnvGetStringRequest.encode,
-  );
-  const responsePtr = host.plugin_env_get_string(writeBufferToPr(requestBytes));
-  const response = Protobuf.decode<HostPluginEnvGetStringResponse>(
-    readBufferFromPtr(responsePtr),
-    HostPluginEnvGetStringResponse.decode,
-  );
-  
-  return response.value;
-}
-
-function stringToUint8Array(input: string): Uint8Array {
-  return Uint8Array.wrap(String.UTF8.encode(input));
-}
-
-function uint8ArrayToString(input: Uint8Array): string {
-  return String.UTF8.decode(input.buffer);
-}
-
-export function base64Encode(input: string): string {
-  return encode(stringToUint8Array(input));
-}
-
-export function base64Decode(input: string): string {
-  return uint8ArrayToString(decode(input));
 }
