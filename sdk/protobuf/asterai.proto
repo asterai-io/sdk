@@ -11,15 +11,15 @@ message AppQuery {
   optional string user_id = 3;
 }
 
-message HashStringRequest {
+message HostHashStringRequest {
   string content = 1;
 }
 
-message HashStringResponse {
+message HostHashStringResponse {
   bytes hash = 1;
 }
 
-message HmacSha1Request {
+message HostHmacSha1Request {
   string content = 1;
   string key = 2;
 }
