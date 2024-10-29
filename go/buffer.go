@@ -7,7 +7,8 @@ import (
 
 func writeBuffer(buffer []byte) uint32 {
 	ptr := heapAlloc(uint32(len(buffer)) + 4)
-	copyToPtr(ptr, buffer)
+	// TODO copy len to ptr+0
+	copyToPtr(ptr+4, buffer)
 	return ptr
 }
 
@@ -20,6 +21,8 @@ func copyToPtr(ptr uint32, buffer []byte) {
 	copy((*[1 << 30]byte)(destination)[:len(buffer)], (*[1 << 30]byte)(source)[:len(buffer)])
 }
 
+// TODO: make new functionm that reads from a ptr alone, parsing the first
+// 4 bytes as the uint32 length.
 func readBuffer(ptr uint32, length int32) []byte {
 	// Convert the uint32 pointer to a uintptr for use with unsafe operations.
 	data := unsafe.Pointer(uintptr(ptr))
