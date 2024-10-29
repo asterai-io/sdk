@@ -13,6 +13,10 @@ import { HostPluginEnvGetStringRequest } from "./generated/HostPluginEnvGetStrin
 import { HostPluginEnvGetStringResponse } from "./generated/HostPluginEnvGetStringResponse";
 import { decode, encode } from "as-base64/assembly";
 import { HostVectorEmbeddingStoreRequest } from "./generated/HostVectorEmbeddingStoreRequest";
+import { HashStringRequest } from "./generated/HashStringRequest";
+import { HashStringResponse } from "./generated/HashStringResponse";
+import { HmacSha1Request } from "./generated/HmacSha1Request";
+import { HostHmacHashStringRequest } from "./generated/HostHmacHashStringRequest";
 
 declare namespace host {
   export function log(request: u32): void;
@@ -22,6 +26,9 @@ declare namespace host {
   export function kv_get_user_string(request: u32): u32;
   export function kv_set_user_string(request: u32): void;
   export function plugin_env_get_string(request: u32): u32;
+  export function crypto_sha1(request: u32): u32;
+  export function crypto_md5(request: u32): u32;
+  export function crypto_hmac(request: u32): u32;
 }
 
 export class Log {
@@ -80,6 +87,50 @@ export class HttpRequest {
       readBufferFromPtr(responsePtr),
       HostHttpResponse.decode,
     );
+  }
+}
+
+export class Crypto {
+  public static sha1(content: string): Uint8Array {
+    const request = new HashStringRequest(content);
+    const requestBytes = Protobuf.encode<HashStringRequest>(
+      request,
+      HashStringRequest.encode,
+    );
+    const responsePtr = host.crypto_sha1(writeBufferToPr(requestBytes));
+    const response = Protobuf.decode<HashStringResponse>(
+      readBufferFromPtr(responsePtr),
+      HashStringResponse.decode,
+    );
+    return response.hash;
+  }
+
+  public static md5(content: string): Uint8Array {
+    const request = new HashStringRequest(content);
+    const requestBytes = Protobuf.encode<HashStringRequest>(
+      request,
+      HashStringRequest.encode,
+    );
+    const responsePtr = host.crypto_md5(writeBufferToPr(requestBytes));
+    const response = Protobuf.decode<HashStringResponse>(
+      readBufferFromPtr(responsePtr),
+      HashStringResponse.decode,
+    );
+    return response.hash;
+  }
+
+  public static hmac(content: string, key: string, hash: string): Uint8Array {
+    const request = new HostHmacHashStringRequest(content, key, hash);
+    const requestBytes = Protobuf.encode<HostHmacHashStringRequest>(
+      request,
+      HostHmacHashStringRequest.encode,
+    );
+    const responsePtr = host.crypto_hmac(writeBufferToPr(requestBytes));
+    const response = Protobuf.decode<HashStringResponse>(
+      readBufferFromPtr(responsePtr),
+      HashStringResponse.decode,
+    );
+    return response.hash;
   }
 }
 
@@ -323,12 +374,25 @@ export function getEnv(key: string): string | null {
   return response.value;
 }
 
-function stringToUint8Array(input: string): Uint8Array {
+export function stringToUint8Array(input: string): Uint8Array {
   return Uint8Array.wrap(String.UTF8.encode(input));
 }
 
-function uint8ArrayToString(input: Uint8Array): string {
+export function uint8ArrayToString(input: Uint8Array): string {
   return String.UTF8.decode(input.buffer);
+}
+
+export function uint8ArrayToHexString(bytes: Uint8Array): string {
+  const hexChars = "0123456789abcdef";
+  let hexString = "";
+
+  for (let i = 0; i < bytes.length; i++) {
+    let byte = bytes[i];
+    hexString += hexChars[byte >> 4];
+    hexString += hexChars[byte & 0x0f];
+  }
+
+  return hexString;
 }
 
 export function base64Encode(input: string): string {

@@ -11,6 +11,20 @@ message AppQuery {
   optional string user_id = 3;
 }
 
+message HostHashStringRequest {
+  string content = 1;
+}
+
+message HostHashStringResponse {
+  bytes hash = 1;
+}
+
+message HostHmacHashStringRequest {
+  string content = 1;
+  string hash = 2;
+  string key = 3;
+}
+
 message HostVectorEmbeddingStoreRequest {
   string content = 1;
   string app_collection_name = 2;
