@@ -16,6 +16,7 @@ import { HostVectorEmbeddingStoreRequest } from "./generated/HostVectorEmbedding
 import { HashStringRequest } from "./generated/HashStringRequest";
 import { HashStringResponse } from "./generated/HashStringResponse";
 import { HmacSha1Request } from "./generated/HmacSha1Request";
+import { HostHmacHashStringRequest } from "./generated/HostHmacHashStringRequest";
 
 declare namespace host {
   export function log(request: u32): void;
@@ -27,7 +28,7 @@ declare namespace host {
   export function plugin_env_get_string(request: u32): u32;
   export function crypto_sha1(request: u32): u32;
   export function crypto_md5(request: u32): u32;
-  export function crypto_hmac_sha1(request: u32): u32;
+  export function crypto_hmac(request: u32): u32;
 }
 
 export class Log {
@@ -118,13 +119,13 @@ export class Crypto {
     return response.hash;
   }
 
-  public static hmacSha1(content: string, key: string): Uint8Array {
-    const request = new HmacSha1Request(content, key);
-    const requestBytes = Protobuf.encode<HmacSha1Request>(
+  public static hmac(content: string, key: string, hash: string): Uint8Array {
+    const request = new HostHmacHashStringRequest(content, key, hash);
+    const requestBytes = Protobuf.encode<HostHmacHashStringRequest>(
       request,
-      HmacSha1Request.encode,
+      HostHmacHashStringRequest.encode,
     );
-    const responsePtr = host.crypto_hmac_sha1(writeBufferToPr(requestBytes));
+    const responsePtr = host.crypto_hmac(writeBufferToPr(requestBytes));
     const response = Protobuf.decode<HashStringResponse>(
       readBufferFromPtr(responsePtr),
       HashStringResponse.decode,

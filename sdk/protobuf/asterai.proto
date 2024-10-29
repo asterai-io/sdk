@@ -19,9 +19,10 @@ message HostHashStringResponse {
   bytes hash = 1;
 }
 
-message HostHmacSha1Request {
+message HostHmacHashStringRequest {
   string content = 1;
-  string key = 2;
+  string hash = 2;
+  string key = 3;
 }
 
 message HostVectorEmbeddingStoreRequest {
