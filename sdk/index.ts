@@ -13,10 +13,9 @@ import { HostPluginEnvGetStringRequest } from "./generated/HostPluginEnvGetStrin
 import { HostPluginEnvGetStringResponse } from "./generated/HostPluginEnvGetStringResponse";
 import { decode, encode } from "as-base64/assembly";
 import { HostVectorEmbeddingStoreRequest } from "./generated/HostVectorEmbeddingStoreRequest";
-import { HashStringRequest } from "./generated/HashStringRequest";
-import { HashStringResponse } from "./generated/HashStringResponse";
-import { HmacSha1Request } from "./generated/HmacSha1Request";
 import { HostHmacHashStringRequest } from "./generated/HostHmacHashStringRequest";
+import { HostHashStringRequest } from "./generated/HostHashStringRequest";
+import { HostHashStringResponse } from "./generated/HostHashStringResponse";
 
 declare namespace host {
   export function log(request: u32): void;
@@ -92,29 +91,29 @@ export class HttpRequest {
 
 export class Crypto {
   public static sha1(content: string): Uint8Array {
-    const request = new HashStringRequest(content);
-    const requestBytes = Protobuf.encode<HashStringRequest>(
+    const request = new HostHashStringRequest(content);
+    const requestBytes = Protobuf.encode<HostHashStringRequest>(
       request,
-      HashStringRequest.encode,
+      HostHashStringRequest.encode,
     );
     const responsePtr = host.crypto_sha1(writeBufferToPr(requestBytes));
-    const response = Protobuf.decode<HashStringResponse>(
+    const response = Protobuf.decode<HostHashStringResponse>(
       readBufferFromPtr(responsePtr),
-      HashStringResponse.decode,
+      HostHashStringResponse.decode,
     );
     return response.hash;
   }
 
   public static md5(content: string): Uint8Array {
-    const request = new HashStringRequest(content);
-    const requestBytes = Protobuf.encode<HashStringRequest>(
+    const request = new HostHashStringRequest(content);
+    const requestBytes = Protobuf.encode<HostHashStringRequest>(
       request,
-      HashStringRequest.encode,
+      HostHashStringRequest.encode,
     );
     const responsePtr = host.crypto_md5(writeBufferToPr(requestBytes));
-    const response = Protobuf.decode<HashStringResponse>(
+    const response = Protobuf.decode<HostHashStringResponse>(
       readBufferFromPtr(responsePtr),
-      HashStringResponse.decode,
+      HostHashStringResponse.decode,
     );
     return response.hash;
   }
@@ -126,9 +125,9 @@ export class Crypto {
       HostHmacHashStringRequest.encode,
     );
     const responsePtr = host.crypto_hmac(writeBufferToPr(requestBytes));
-    const response = Protobuf.decode<HashStringResponse>(
+    const response = Protobuf.decode<HostHashStringResponse>(
       readBufferFromPtr(responsePtr),
-      HashStringResponse.decode,
+      HostHashStringResponse.decode,
     );
     return response.hash;
   }
