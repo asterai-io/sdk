@@ -1,4 +1,4 @@
-package main
+package sdk
 
 import (
 	asterai "github.com/asterai-io/sdk/go/protobuf"

@@ -1,4 +1,4 @@
-package main
+package sdk
 
 //export host.log
 func hostLog(request uint32)
