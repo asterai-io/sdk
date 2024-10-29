@@ -20,9 +20,25 @@ message HostHashStringResponse {
 }
 
 message HostHmacHashStringRequest {
-  string content = 1;
-  string hash = 2;
+  string hash = 1;
+  string content = 2;
   string key = 3;
+}
+
+message HostRandomBytesRequest {
+  int32 length = 1;
+}
+
+message HostRandomBytesResponse {
+  bytes bytes = 1;
+}
+
+message HostHexStringToBase64StringRequest {
+  string hex_string = 1;
+}
+
+message HostHexStringToBase64StringResponse {
+  string base64_string = 1;
 }
 
 message HostVectorEmbeddingStoreRequest {
