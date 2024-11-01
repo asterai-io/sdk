@@ -16,8 +16,6 @@ import { HostVectorEmbeddingStoreRequest } from "./generated/HostVectorEmbedding
 import { HostHmacHashStringRequest } from "./generated/HostHmacHashStringRequest";
 import { HostHashStringRequest } from "./generated/HostHashStringRequest";
 import { HostHashStringResponse } from "./generated/HostHashStringResponse";
-import { HostHexStringToBase64StringRequest } from "./generated/HostHexStringToBase64StringRequest";
-import { HostHexStringToBase64StringResponse } from "./generated/HostHexStringToBase64StringResponse";
 import { HostRandomBytesRequest } from "./generated/HostRandomBytesRequest";
 import { HostRandomBytesResponse } from "./generated/HostRandomBytesResponse";
 
@@ -32,7 +30,6 @@ declare namespace host {
   export function crypto_sha1(request: u32): u32;
   export function crypto_md5(request: u32): u32;
   export function crypto_hmac(request: u32): u32;
-  export function hex_string_to_base64_string(request: u32): u32;
   export function random_bytes(request: u32): u32;
 }
 
