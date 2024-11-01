@@ -408,22 +408,6 @@ export function base64Decode(input: string): string {
   return uint8ArrayToString(decode(input));
 }
 
-export function hexStringToBase64String(input: string): string {
-  const request = new HostHexStringToBase64StringRequest(input);
-  const requestBytes = Protobuf.encode<HostHexStringToBase64StringRequest>(
-    request,
-    HostHexStringToBase64StringRequest.encode,
-  );
-  const responsePtr = host.hex_string_to_base64_string(
-    writeBufferToPr(requestBytes),
-  );
-  const response = Protobuf.decode<HostHexStringToBase64StringResponse>(
-    readBufferFromPtr(responsePtr),
-    HostHexStringToBase64StringResponse.decode,
-  );
-  return response.base64String;
-}
-
 export function randomBytes(length: i32): Uint8Array {
   const request = new HostRandomBytesRequest(length);
   const requestBytes = Protobuf.encode<HostRandomBytesRequest>(
