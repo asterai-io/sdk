@@ -25,14 +25,12 @@ func ReadBuffer(ptr uint32) []byte {
 	return (*[1 << 30]byte)(unsafe.Add(data, 4))[:length:length]
 }
 
-//export allocate
 //go:wasmexport allocate
 func heapAlloc(len uint32) uint32 {
 	slice := make([]byte, len)
 	return *(*uint32)(unsafe.Pointer(&slice))
 }
 
-//export deallocate
 //go:wasmexport deallocate
 func heapDealloc(_len uint32) {
 	// This is just a placeholder.
