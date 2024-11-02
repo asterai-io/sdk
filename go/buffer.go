@@ -33,3 +33,8 @@ func readBuffer(ptr uint32) []byte {
 	// Now read the actual data, skipping the first 4 bytes used for length.
 	return (*[1 << 30]byte)(unsafe.Add(data, 4))[:length:length]
 }
+
+func heapAlloc(len uint32) uint32 {
+	slice := make([]byte, len)
+	return *(*uint32)(unsafe.Pointer(&slice))
+}
