@@ -26,11 +26,11 @@ func LogInfo(content string) {
 }
 
 func log(content string, level string) {
-	request := asterai.HostLogRequest{
+	request := &asterai.HostLogRequest{
 		Content: content,
 		Level:   level,
 	}
-	bytes, _ := proto.Marshal(&request)
+	bytes, _ := proto.Marshal(request)
 	ptr := WriteBuffer(bytes)
 	hostLog(ptr)
 }
