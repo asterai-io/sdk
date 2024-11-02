@@ -31,6 +31,6 @@ func log(content string, level string) {
 		Level:   level,
 	}
 	bytes, _ := proto.Marshal(&request)
-	ptr := writeBuffer(bytes)
+	ptr := WriteBuffer(bytes)
 	hostLog(ptr)
 }

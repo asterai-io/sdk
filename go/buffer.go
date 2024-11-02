@@ -6,7 +6,7 @@ import (
 	"unsafe"
 )
 
-func writeBuffer(buffer []byte) uint32 {
+func WriteBuffer(buffer []byte) uint32 {
 	ptr := heapAlloc(uint32(len(buffer)) + 4)
 	// Write the length as a uint32 at the start of the allocated memory.
 	binary.LittleEndian.PutUint32(
@@ -25,7 +25,7 @@ func copyToPtr(ptr uint32, buffer []byte) {
 	copy((*[1 << 30]byte)(destination)[:len(buffer)], (*[1 << 30]byte)(source)[:len(buffer)])
 }
 
-func readBuffer(ptr uint32) []byte {
+func ReadBuffer(ptr uint32) []byte {
 	// Convert the uint32 pointer to a uintptr for use with unsafe operations.
 	data := unsafe.Pointer(uintptr(ptr))
 	// Read the length (uint32).

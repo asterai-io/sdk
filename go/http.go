@@ -23,9 +23,9 @@ func HttpRequest(
 		Request: requestString,
 	}
 	requestBytes, _ := proto.Marshal(&requestMessage)
-	requestPtr := writeBuffer(requestBytes)
+	requestPtr := WriteBuffer(requestBytes)
 	responsePtr := hostHttpRequest(requestPtr)
-	responseBytes := readBuffer(responsePtr)
+	responseBytes := ReadBuffer(responsePtr)
 	var response asterai.HostHttpResponse
 	_ = proto.Unmarshal(responseBytes, &response)
 	return response
