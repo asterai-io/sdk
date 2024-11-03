@@ -2,9 +2,10 @@ package sdk
 
 import (
 	"encoding/binary"
-	"reflect"
 	"unsafe"
 )
+
+var allocatedBytes = map[uint32][]byte{}
 
 func WriteBuffer(buffer []byte) uint32 {
 	bufferLen := uint32(len(buffer))
@@ -30,16 +31,14 @@ func ReadBuffer(ptr uint32) []byte {
 //go:wasmexport allocate
 func heapAlloc(len uint32) uint32 {
 	slice := make([]byte, len)
-	// Convert the slice header to get the actual memory address
-	sliceHeader := (*reflect.SliceHeader)(unsafe.Pointer(&slice))
-	// Return the address as uint32. Note: This assumes that the address can fit in 32 bits,
-	// which might not always be true on all systems but should be fine for WASM.
-	return uint32(sliceHeader.Data)
+	ptr := &slice[0]
+	unsafePtr := uint32(uintptr(unsafe.Pointer(ptr)))
+	allocatedBytes[unsafePtr] = slice
+	return unsafePtr
 }
 
 //export deallocate
 //go:wasmexport deallocate
-func heapDealloc(_len uint32) {
-	// This is just a placeholder.
-	// The GC deallocs.
+func heapDealloc(ptr uint32) {
+	delete(allocatedBytes, ptr)
 }
