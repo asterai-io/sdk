@@ -2,7 +2,6 @@ package sdk
 
 import (
 	asterai "github.com/asterai-io/sdk/go/protobuf"
-	proto "google.golang.org/protobuf/proto"
 )
 
 func LogTrace(content string) {
@@ -18,11 +17,11 @@ func LogError(content string) {
 }
 
 func LogWarn(content string) {
-	log(content, "error")
+	log(content, "warn")
 }
 
 func LogInfo(content string) {
-	log(content, "error")
+	log(content, "info")
 }
 
 func log(content string, level string) {
@@ -30,7 +29,7 @@ func log(content string, level string) {
 		Content: content,
 		Level:   level,
 	}
-	bytes, _ := proto.Marshal(request)
+	bytes, _ := request.MarshalVT()
 	ptr := WriteBuffer(bytes)
 	hostLog(ptr)
 }

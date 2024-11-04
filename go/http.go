@@ -3,7 +3,6 @@ package sdk
 import (
 	"fmt"
 	asterai "github.com/asterai-io/sdk/go/protobuf"
-	"google.golang.org/protobuf/proto"
 	"io"
 	"net/http"
 	"net/url"
@@ -16,18 +15,18 @@ func HttpRequest(
 	query map[string]string,
 	headers map[string]string,
 	body string,
-) asterai.HostHttpResponse {
+) *asterai.HostHttpResponse {
 	req, _ := buildRequest(method, baseUrl, query, headers, body)
 	requestString := requestToRawString(req)
 	requestMessage := asterai.HostHttpRequest{
 		Request: requestString,
 	}
-	requestBytes, _ := proto.Marshal(&requestMessage)
+	requestBytes, _ := requestMessage.MarshalVT()
 	requestPtr := WriteBuffer(requestBytes)
 	responsePtr := hostHttpRequest(requestPtr)
 	responseBytes := ReadBuffer(responsePtr)
-	var response asterai.HostHttpResponse
-	_ = proto.Unmarshal(responseBytes, &response)
+	response := &asterai.HostHttpResponse{}
+	_ = response.UnmarshalVT(responseBytes)
 	return response
 }
 
