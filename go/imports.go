@@ -2,7 +2,7 @@ package sdk
 
 //go:wasm-module index
 //export host.log
-//go:wasmimport index host.http_request
+//go:wasmimport index host.log
 func hostLog(request uint32)
 
 //go:wasm-module index
