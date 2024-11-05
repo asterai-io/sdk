@@ -9,14 +9,18 @@ import (
 	"strings"
 )
 
-func HttpRequest(
+func SendNewHttpRequest(
 	method string,
 	baseUrl string,
-	query map[string]string,
-	headers map[string]string,
+	query *map[string]string,
+	headers *map[string]string,
 	body string,
 ) *asterai.HostHttpResponse {
-	req, _ := buildRequest(method, baseUrl, query, headers, body)
+	req, _ := NewHttpRequest(method, baseUrl, query, headers, body)
+	return SendHttpRequest(req)
+}
+
+func SendHttpRequest(req *http.Request) *asterai.HostHttpResponse {
 	requestString := requestToRawString(req)
 	requestMessage := asterai.HostHttpRequest{
 		Request: requestString,
@@ -30,11 +34,11 @@ func HttpRequest(
 	return response
 }
 
-func buildRequest(
+func NewHttpRequest(
 	method string,
 	baseUrl string,
-	query map[string]string,
-	headers map[string]string,
+	query *map[string]string,
+	headers *map[string]string,
 	body string,
 ) (*http.Request, error) {
 	parsedUrl := buildUrlWithQueryString(baseUrl, query)
@@ -42,19 +46,19 @@ func buildRequest(
 	if err != nil {
 		return nil, err
 	}
-	for key, value := range headers {
+	for key, value := range *headers {
 		req.Header.Set(key, value)
 	}
 	return req, nil
 }
 
-func buildUrlWithQueryString(baseURL string, query map[string]string) string {
+func buildUrlWithQueryString(baseURL string, query *map[string]string) string {
 	u, err := url.Parse(baseURL)
 	if err != nil {
 		return ""
 	}
 	q := u.Query()
-	for key, value := range query {
+	for key, value := range *query {
 		q.Set(key, value)
 	}
 	u.RawQuery = q.Encode()
