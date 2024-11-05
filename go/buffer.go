@@ -9,7 +9,7 @@ var allocs = make(map[uintptr][]byte)
 
 func WriteBuffer(buffer []byte) uint32 {
 	bufferLen := uint32(len(buffer))
-	ptr := heapAlloc(uintptr(bufferLen + 4))
+	ptr := heapAlloc(bufferLen + 4)
 	binary.LittleEndian.PutUint32((*[4]byte)(unsafe.Pointer(uintptr(ptr)))[:], bufferLen)
 	copyToPtr(unsafe.Pointer(uintptr(ptr)+4), buffer)
 	return uint32(uintptr(ptr))
@@ -32,7 +32,7 @@ func ReadBuffer(ptr uint32) []byte {
 //
 //go:wasmexport allocate
 //export allocate
-func heapAlloc(size uintptr) unsafe.Pointer {
+func heapAlloc(size uint32) unsafe.Pointer {
 	if size == 0 {
 		return nil
 	}
