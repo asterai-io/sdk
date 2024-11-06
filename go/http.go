@@ -54,6 +54,9 @@ func NewHttpRequest(
 	if req.Header.Get("Content-Length") == "" {
 		req.Header.Set("Content-Length", fmt.Sprintf("%v", len(body)))
 	}
+	if req.Header.Get("Connection") == "" {
+		req.Header.Set("Connection", "close")
+	}
 	return req, nil
 }
 
