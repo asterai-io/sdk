@@ -10,6 +10,8 @@ const ANSI_COLORS = {
 
 const USER_PREFIX = `${ANSI_COLORS.bold}user: ${ANSI_COLORS.reset}`;
 const ASSISTANT_PREFIX = `${ANSI_COLORS.bold}assistant: ${ANSI_COLORS.reset}`;
+const PRODUCTION_BASE_URL = "https://api.asterai.io";
+const STAGING_BASE_URL = "https://staging.api.asterai.io";
 
 export default class Query extends Command {
   static args = {};
@@ -28,6 +30,13 @@ export default class Query extends Command {
       required: true,
       description: "app query key",
     }),
+    staging: Flags.boolean({
+      char: "s",
+    }),
+    endpoint: Flags.string({
+      char: "e",
+      default: PRODUCTION_BASE_URL,
+    }),
   };
 
   async run(): Promise<void> {
@@ -37,9 +46,11 @@ export default class Query extends Command {
     const addToOutput = (v: string) => {
       output += v;
     };
+    const apiBaseUrl = flags.staging ? STAGING_BASE_URL : flags.endpoint;
     const client = new AsteraiClient({
       appId: flags.app,
       queryKey: flags.key,
+      apiBaseUrl,
     });
     const conversationId = uuidv4();
     // Configure STDIN for when raw mode is enabled.
