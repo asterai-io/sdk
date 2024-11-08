@@ -46,6 +46,7 @@ export default class Query extends Command {
     process.stdin.setEncoding("utf8");
     process.stdin.on("data", key => {
       if (key.toString() === "\u0003") {
+        process.stdout.write("\n");
         process.exit();
       }
     });
