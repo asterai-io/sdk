@@ -1,6 +1,8 @@
 // TODO: source this from a central public repo.
 syntax = "proto3";
 
+option go_package = ".;asterai";
+
 message PluginContext {
   AppQuery query = 1;
 }
@@ -55,6 +57,10 @@ message HostVectorEmbeddingSimilarityScore {
 message HostLogRequest {
   string content = 1;
   string level = 2;
+}
+
+message HostSleepRequest {
+  uint64 milliseconds = 1;
 }
 
 message HostHttpRequest {

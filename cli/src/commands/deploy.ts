@@ -1,4 +1,4 @@
-import { Args, Command, Flags } from "@oclif/core";
+import { Command, Flags } from "@oclif/core";
 import fs from "fs";
 import path from "path";
 import FormData from "form-data";
@@ -18,11 +18,7 @@ type DeployFlags = {
 };
 
 export default class Deploy extends Command {
-  static args = {
-    input: Args.string({
-      default: "plugin.ts",
-    }),
-  };
+  static args = {};
 
   static description = "compiles and uploads the plugin to asterai";
 
@@ -48,11 +44,34 @@ export default class Deploy extends Command {
     staging: Flags.boolean({
       char: "s",
     }),
+    wasm: Flags.string({
+      char: "w",
+      description: "wasm module path",
+    }),
+    plugin: Flags.string({
+      char: "p",
+      description: "plugin source path",
+      default: "plugin.ts",
+    }),
   };
 
   async run(): Promise<void> {
-    const { args, flags } = await this.parse(Deploy);
-    const output = await build(args, flags);
+    const { flags } = await this.parse(Deploy);
+    if (flags.wasm) {
+      // Deploy the wasm module passed in the input.
+      const deployArgs: DeployArgs = {
+        outputFile: flags.wasm,
+        manifestPath: flags.manifest,
+      };
+      await deploy(deployArgs, flags);
+      return;
+    }
+    // No WASM output was passed; build the module
+    // from the plugin source code and deploy the output.
+    const buildArgs = {
+      input: flags.plugin,
+    };
+    const output = await build(buildArgs, flags);
     await deploy(output, flags);
   }
 }
