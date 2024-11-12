@@ -258,6 +258,24 @@ func (x *HostLogRequest) GetLevel() string {
 	return ""
 }
 
+type HostSleepRequest struct {
+	unknownFields []byte
+	Milliseconds  uint64 `protobuf:"varint,1,opt,name=milliseconds,proto3" json:"milliseconds,omitempty"`
+}
+
+func (x *HostSleepRequest) Reset() {
+	*x = HostSleepRequest{}
+}
+
+func (*HostSleepRequest) ProtoMessage() {}
+
+func (x *HostSleepRequest) GetMilliseconds() uint64 {
+	if x != nil {
+		return x.Milliseconds
+	}
+	return 0
+}
+
 type HostHttpRequest struct {
 	unknownFields []byte
 	Request       string `protobuf:"bytes,1,opt,name=request,proto3" json:"request,omitempty"`
@@ -631,6 +649,23 @@ func (m *HostLogRequest) CloneMessageVT() protobuf_go_lite.CloneMessage {
 	return m.CloneVT()
 }
 
+func (m *HostSleepRequest) CloneVT() *HostSleepRequest {
+	if m == nil {
+		return (*HostSleepRequest)(nil)
+	}
+	r := new(HostSleepRequest)
+	r.Milliseconds = m.Milliseconds
+	if len(m.unknownFields) > 0 {
+		r.unknownFields = make([]byte, len(m.unknownFields))
+		copy(r.unknownFields, m.unknownFields)
+	}
+	return r
+}
+
+func (m *HostSleepRequest) CloneMessageVT() protobuf_go_lite.CloneMessage {
+	return m.CloneVT()
+}
+
 func (m *HostHttpRequest) CloneVT() *HostHttpRequest {
 	if m == nil {
 		return (*HostHttpRequest)(nil)
@@ -994,6 +1029,25 @@ func (this *HostLogRequest) EqualVT(that *HostLogRequest) bool {
 
 func (this *HostLogRequest) EqualMessageVT(thatMsg any) bool {
 	that, ok := thatMsg.(*HostLogRequest)
+	if !ok {
+		return false
+	}
+	return this.EqualVT(that)
+}
+func (this *HostSleepRequest) EqualVT(that *HostSleepRequest) bool {
+	if this == that {
+		return true
+	} else if this == nil || that == nil {
+		return false
+	}
+	if this.Milliseconds != that.Milliseconds {
+		return false
+	}
+	return string(this.unknownFields) == string(that.unknownFields)
+}
+
+func (this *HostSleepRequest) EqualMessageVT(thatMsg any) bool {
+	that, ok := thatMsg.(*HostSleepRequest)
 	if !ok {
 		return false
 	}
@@ -1614,6 +1668,44 @@ func (m *HostLogRequest) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *HostSleepRequest) MarshalVT() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVT(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *HostSleepRequest) MarshalToVT(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVT(dAtA[:size])
+}
+
+func (m *HostSleepRequest) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.Milliseconds != 0 {
+		i = protobuf_go_lite.EncodeVarint(dAtA, i, uint64(m.Milliseconds))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *HostHttpRequest) MarshalVT() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -2086,6 +2178,19 @@ func (m *HostLogRequest) SizeVT() (n int) {
 	l = len(m.Level)
 	if l > 0 {
 		n += 1 + l + protobuf_go_lite.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *HostSleepRequest) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Milliseconds != 0 {
+		n += 1 + protobuf_go_lite.SizeOfVarint(uint64(m.Milliseconds))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -3335,6 +3440,76 @@ func (m *HostLogRequest) UnmarshalVT(dAtA []byte) error {
 			}
 			m.Level = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return protobuf_go_lite.ErrInvalidLength
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.unknownFields = append(m.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *HostSleepRequest) UnmarshalVT(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return protobuf_go_lite.ErrIntOverflow
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: HostSleepRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: HostSleepRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Milliseconds", wireType)
+			}
+			m.Milliseconds = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protobuf_go_lite.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Milliseconds |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := protobuf_go_lite.Skip(dAtA[iNdEx:])

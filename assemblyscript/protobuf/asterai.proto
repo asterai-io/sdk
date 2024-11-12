@@ -51,6 +51,10 @@ message HostLogRequest {
   string level = 2;
 }
 
+message HostSleepRequest {
+  uint64 milliseconds = 1;
+}
+
 message HostHttpRequest {
   string request = 1;
 }
