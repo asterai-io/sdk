@@ -22,7 +22,7 @@ $ npm install -g @asterai/cli
 $ asterai COMMAND
 running command...
 $ asterai (--version)
-@asterai/cli/0.3.2 linux-x64 node-v20.12.2
+@asterai/cli/0.4.0 linux-x64 node-v20.12.2
 $ asterai --help [COMMAND]
 USAGE
   $ asterai COMMAND
@@ -41,6 +41,7 @@ USAGE
 - [`asterai deploy [INPUT]`](#asterai-deploy-input)
 - [`asterai help [COMMAND]`](#asterai-help-command)
 - [`asterai init [OUTDIR]`](#asterai-init-outdir)
+- [`asterai query`](#asterai-query)
 
 ## `asterai auth KEY`
 
@@ -57,7 +58,7 @@ EXAMPLES
   $ asterai auth
 ```
 
-_See code: [src/commands/auth.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.3.2/src/commands/auth.ts)_
+_See code: [src/commands/auth.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.4.0/src/commands/auth.ts)_
 
 ## `asterai build [INPUT]`
 
@@ -77,7 +78,7 @@ EXAMPLES
   $ asterai build
 ```
 
-_See code: [src/commands/build.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.3.2/src/commands/build.ts)_
+_See code: [src/commands/build.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.4.0/src/commands/build.ts)_
 
 ## `asterai codegen`
 
@@ -101,7 +102,7 @@ EXAMPLES
   $ asterai codegen
 ```
 
-_See code: [src/commands/codegen.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.3.2/src/commands/codegen.ts)_
+_See code: [src/commands/codegen.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.4.0/src/commands/codegen.ts)_
 
 ## `asterai deploy [INPUT]`
 
@@ -124,7 +125,7 @@ EXAMPLES
   $ asterai deploy --app 66a46b12-b1a7-4b72-a64a-0e4fe21902b6
 ```
 
-_See code: [src/commands/deploy.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.3.2/src/commands/deploy.ts)_
+_See code: [src/commands/deploy.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.4.0/src/commands/deploy.ts)_
 
 ## `asterai help [COMMAND]`
 
@@ -161,6 +162,29 @@ EXAMPLES
   $ asterai init project-name
 ```
 
-_See code: [src/commands/init.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.3.2/src/commands/init.ts)_
+_See code: [src/commands/init.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.4.0/src/commands/init.ts)_
+
+## `asterai query`
+
+query an asterai app interactively
+
+```
+USAGE
+  $ asterai query -a <value> -k <value> [-s] [-e <value>]
+
+FLAGS
+  -a, --app=<value>       (required)
+  -e, --endpoint=<value>  [default: https://api.asterai.io]
+  -k, --key=<value>       (required) app query key
+  -s, --staging
+
+DESCRIPTION
+  query an asterai app interactively
+
+EXAMPLES
+  $ asterai query
+```
+
+_See code: [src/commands/query.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.4.0/src/commands/query.ts)_
 
 <!-- commandsstop -->
