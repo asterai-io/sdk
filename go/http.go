@@ -17,12 +17,15 @@ func SendNewHttpRequest(
 	query *map[string]string,
 	headers *map[string]string,
 	body string,
-) *asterai.HostHttpResponse {
-	req, _ := NewHttpRequest(method, baseUrl, query, headers, body)
+) (*http.Response, error) {
+	req, e := NewHttpRequest(method, baseUrl, query, headers, body)
+	if e != nil {
+		return nil, e
+	}
 	return SendHttpRequest(req)
 }
 
-func SendHttpRequest(req *http.Request) *asterai.HostHttpResponse {
+func SendHttpRequest(req *http.Request) (*http.Response, error) {
 	requestString := requestToRawString(req)
 	requestMessage := asterai.HostHttpRequest{
 		Request: requestString,
@@ -32,8 +35,16 @@ func SendHttpRequest(req *http.Request) *asterai.HostHttpResponse {
 	responsePtr := hostHttpRequest(requestPtr)
 	responseBytes := ReadBuffer(responsePtr)
 	response := &asterai.HostHttpResponse{}
-	_ = response.UnmarshalVT(responseBytes)
-	return response
+	e := response.UnmarshalVT(responseBytes)
+	if e != nil {
+		return nil, e
+	}
+	rawResponse := response.Response
+	res, e := parseRawHttpResponse(rawResponse, req)
+	if e != nil {
+		return nil, e
+	}
+	return res, nil
 }
 
 func NewHttpRequest(
@@ -58,6 +69,18 @@ func NewHttpRequest(
 		req.Header.Set("Connection", "close")
 	}
 	return req, nil
+}
+
+func parseRawHttpResponse(
+	rawResponse string,
+	req *http.Request,
+) (*http.Response, error) {
+	reader := strings.NewReader(rawResponse)
+	res, err := http.ReadResponse(bufio.NewReader(reader), req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
 func buildUrlWithQueryString(baseURL string, query *map[string]string) string {
