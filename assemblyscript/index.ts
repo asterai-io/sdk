@@ -16,6 +16,8 @@ import { HostVectorEmbeddingStoreRequest } from "./generated/HostVectorEmbedding
 import { HostHmacHashStringRequest } from "./generated/HostHmacHashStringRequest";
 import { HostHashStringRequest } from "./generated/HostHashStringRequest";
 import { HostHashStringResponse } from "./generated/HostHashStringResponse";
+import { HostRandomBytesRequest } from "./generated/HostRandomBytesRequest";
+import { HostRandomBytesResponse } from "./generated/HostRandomBytesResponse";
 
 declare namespace host {
   export function log(request: u32): void;
@@ -28,6 +30,7 @@ declare namespace host {
   export function crypto_sha1(request: u32): u32;
   export function crypto_md5(request: u32): u32;
   export function crypto_hmac(request: u32): u32;
+  export function random_bytes(request: u32): u32;
 }
 
 export class Log {
@@ -118,8 +121,8 @@ export class Crypto {
     return response.hash;
   }
 
-  public static hmac(content: string, key: string, hash: string): Uint8Array {
-    const request = new HostHmacHashStringRequest(content, key, hash);
+  public static hmac(hash: string, content: string, key: string): Uint8Array {
+    const request = new HostHmacHashStringRequest(hash, content, key);
     const requestBytes = Protobuf.encode<HostHmacHashStringRequest>(
       request,
       HostHmacHashStringRequest.encode,
@@ -400,4 +403,18 @@ export function base64Encode(input: string): string {
 
 export function base64Decode(input: string): string {
   return uint8ArrayToString(decode(input));
+}
+
+export function randomBytes(length: i32): Uint8Array {
+  const request = new HostRandomBytesRequest(length);
+  const requestBytes = Protobuf.encode<HostRandomBytesRequest>(
+    request,
+    HostRandomBytesRequest.encode,
+  );
+  const responsePtr = host.random_bytes(writeBufferToPr(requestBytes));
+  const response = Protobuf.decode<HostRandomBytesResponse>(
+    readBufferFromPtr(responsePtr),
+    HostRandomBytesResponse.decode,
+  );
+  return response.bytes;
 }
