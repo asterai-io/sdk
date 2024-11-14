@@ -1,6 +1,6 @@
 # @asterai/sdk
 
-asterai's AssemblyScript SDK for writing plugins.
+asterai's AssemblyScript SDK for writing plugins in AssemblyScript.
 
 ## Documentation
 
