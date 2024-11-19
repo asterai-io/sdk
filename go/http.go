@@ -247,3 +247,16 @@ func valueOrDefault(value, def string) string {
 	}
 	return def
 }
+
+var _ http.RoundTripper = &RoundTrip{}
+
+type RoundTrip struct {
+}
+
+func NewRoundTripper() *RoundTrip {
+	return &RoundTrip{}
+}
+
+func (r *RoundTrip) RoundTrip(req *http.Request) (*http.Response, error) {
+	return SendHttpRequest(req)
+}
