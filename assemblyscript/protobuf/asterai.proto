@@ -5,6 +5,7 @@ option go_package = ".;asterai";
 
 message PluginContext {
   AppQuery query = 1;
+  string app_id = 2;
 }
 
 message AppQuery {
