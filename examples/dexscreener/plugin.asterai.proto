@@ -8,6 +8,7 @@ service Dexscreener {
 message SearchTokenInput {
   // the URL-encoded search query for fetching token prices.
   // For example, this could be an address, a symbol, a protocol name, etc.
+  // Do not include any instances of the character "$" in the query.
   string query = 2;
 }
 
