@@ -1,0 +1,8 @@
+[package]
+name = "asterai"
+description = "Package containing asterai client library and CLI"
+version = "0.0.0"
+edition = "2021"
+license = "BUSL-1.1"
+
+[dependencies]
