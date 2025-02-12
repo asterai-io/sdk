@@ -1,4 +1,4 @@
-import { VectorEmbedding, Log } from "@asterai/sdk";
+import { VectorEmbedding, Log, getEnv } from "@asterai/sdk";
 import { PluginContext } from "./generated/PluginContext";
 import { ProcessQueryOutput } from "./generated/ProcessQueryOutput";
 import { HostVectorEmbeddingSearchRequest } from "@asterai/sdk/generated/HostVectorEmbeddingSearchRequest";
@@ -11,17 +11,23 @@ export function processQuery(input: PluginContext): ProcessQueryOutput {
   request.query = input.query.content;
 
   let similarityResult = VectorEmbedding.semanticSearch(request);
+  const envRequiredScore = getEnv("REQUIRED_SCORE");
+  const requiredScore = envRequiredScore ? parseFloat(envRequiredScore) : 0.5;
 
   let resultString = "";
   for (let i = 0; i < similarityResult.length; i++) {
     const result = similarityResult[i];
+    if (result.score < requiredScore) {
+      continue;
+    }
+
     let flattenedPayload = "";
-    let keys = result.payload.keys() as Array<string>;
+    let keys = result.payload.keys();
     for (let x = 0; x < keys.length; x++) {
       let payload = result.payload.get(keys[x]);
       flattenedPayload += `${keys[x]}: ${payload}, `;
     }
-    flattenedPayload = flattenedPayload.slice(0, -2); 
+    flattenedPayload = flattenedPayload.slice(0, -2);
 
     resultString += `embedding similarity (score=${result.score}): ${flattenedPayload}`;
   }
