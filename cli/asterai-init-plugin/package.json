@@ -1,23 +1,17 @@
 {
   "name": "plugin",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
-  "author": "asterai",
-  "license": "MIT",
+  "author": "",
+  "license": "UNLICENSED",
   "scripts": {
     "auth": "asterai auth",
-    "codegen": "asterai codegen",
-    "build": "asterai build",
+    "pkg": "asterai pkg",
     "deploy": "asterai deploy"
   },
   "type": "module",
   "devDependencies": {
     "@asterai/cli": "latest",
-    "@asterai/sdk": "latest",
-    "@asterai/as-proto": "latest",
-    "@asterai/as-proto-gen": "latest"
-  },
-  "peerDependencies": {
-    "assemblyscript": "0.27.27"
+    "@asterai/sdk": "latest"
   }
 }
