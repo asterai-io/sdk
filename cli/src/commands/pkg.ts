@@ -71,11 +71,14 @@ export const pkg = async (
       Authorization: getConfigValue("key"),
       ...form.getHeaders(),
     },
+    responseType: "arraybuffer",
   });
   if (response.status < 200 || response.status >= 300) {
     throw new Error("request failed");
   }
-  await fs.writeFile(outputFile, response.data, { encoding: "utf8" });
+  await fs.writeFile(outputFile, Buffer.from(response.data), {
+    encoding: "binary",
+  });
   return {
     outputFile,
     witPath,
