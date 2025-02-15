@@ -4,14 +4,13 @@ import path from "path";
 import FormData from "form-data";
 import axios from "axios";
 import { getConfigValue } from "../config.js";
-import { pkg, PkgOutput } from "./pkg.js";
 
 const PRODUCTION_ENDPOINT = "https://api.asterai.io/app/plugin";
 const STAGING_ENDPOINT = "https://staging.api.asterai.io/app/plugin";
 
-type DeployArgs = PkgOutput;
-
 type DeployFlags = {
+  plugin: string;
+  pkg: string;
   app: string;
   endpoint: string;
   staging: boolean;
@@ -20,7 +19,7 @@ type DeployFlags = {
 export default class Deploy extends Command {
   static args = {};
 
-  static description = "compiles and uploads the plugin to asterai";
+  static description = "uploads a plugin to asterai";
 
   static examples = [
     `<%= config.bin %> <%= command.id %> --app 66a46b12-b1a7-4b72-a64a-0e4fe21902b6`,
@@ -44,47 +43,27 @@ export default class Deploy extends Command {
     staging: Flags.boolean({
       char: "s",
     }),
-    wasm: Flags.string({
-      char: "w",
-      description: "wasm module path",
-    }),
     plugin: Flags.string({
-      char: "p",
-      description: "plugin source path",
-      default: "plugin.ts",
+      description: "plugin WASM path",
+      default: "plugin.wasm",
+    }),
+    pkg: Flags.string({
+      description: "package WASM path",
+      default: "package.wasm",
     }),
   };
 
   async run(): Promise<void> {
     const { flags } = await this.parse(Deploy);
-    if (flags.wasm) {
-      // Deploy the wasm module passed in the input.
-      const deployArgs: DeployArgs = {
-        outputFile: flags.wasm,
-        witPath: flags.manifest,
-      };
-      await deploy(deployArgs, flags);
-      return;
-    }
-    // No WASM output was passed; build the module
-    // from the plugin source code and deploy the output.
-    const buildArgs = {
-      input: flags.plugin,
-    };
-    const output = await pkg(buildArgs, flags);
-    await deploy(output, flags);
+    await deploy(flags);
   }
 }
 
-const deploy = async (args: DeployArgs, flags: DeployFlags) => {
+const deploy = async (flags: DeployFlags) => {
   const form = new FormData();
   form.append("app_id", flags.app);
-  form.append("module", fs.readFileSync(args.outputFile));
-  const manifestString = fs.readFileSync(args.witPath, {
-    encoding: "utf8",
-  });
-  const mergedManifestString = mergeProtoImports(manifestString, args.witPath);
-  form.append("manifest", mergedManifestString);
+  form.append("plugin.wasm", fs.readFileSync(flags.plugin));
+  form.append("package.wasm", fs.readFileSync(flags.pkg));
   const url = flags.staging ? STAGING_ENDPOINT : flags.endpoint;
   await axios({
     url,
