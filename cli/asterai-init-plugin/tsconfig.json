@@ -1,4 +1,8 @@
 {
   "extends": "assemblyscript/std/assembly.json",
-  "include": ["./**/*.ts"]
+  "include": ["./**/*.ts"],
+  "compilerOptions": {
+    "outDir": "build",
+    "module": "ESNext"
+  }
 }

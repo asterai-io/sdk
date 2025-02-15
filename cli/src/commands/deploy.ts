@@ -1,17 +1,14 @@
 import { Command, Flags } from "@oclif/core";
 import fs from "fs";
-import path from "path";
 import FormData from "form-data";
 import axios from "axios";
 import { getConfigValue } from "../config.js";
-
-const PRODUCTION_ENDPOINT = "https://api.asterai.io/app/plugin";
-const STAGING_ENDPOINT = "https://staging.api.asterai.io/app/plugin";
+import { BASE_API_URL, BASE_API_URL_STAGING } from "../const.js";
 
 type DeployFlags = {
   plugin: string;
   pkg: string;
-  app: string;
+  app?: string;
   endpoint: string;
   staging: boolean;
 };
@@ -29,7 +26,7 @@ export default class Deploy extends Command {
     app: Flags.string({
       char: "a",
       description: "app ID to immediately configure this plugin with",
-      required: true,
+      required: false,
     }),
     manifest: Flags.string({
       char: "m",
@@ -38,7 +35,7 @@ export default class Deploy extends Command {
     }),
     endpoint: Flags.string({
       char: "e",
-      default: PRODUCTION_ENDPOINT,
+      default: BASE_API_URL,
     }),
     staging: Flags.boolean({
       char: "s",
@@ -61,12 +58,14 @@ export default class Deploy extends Command {
 
 const deploy = async (flags: DeployFlags) => {
   const form = new FormData();
-  form.append("app_id", flags.app);
+  if (flags.app) {
+    form.append("app_id", flags.app);
+  }
   form.append("plugin.wasm", fs.readFileSync(flags.plugin));
   form.append("package.wasm", fs.readFileSync(flags.pkg));
-  const url = flags.staging ? STAGING_ENDPOINT : flags.endpoint;
+  const baseApiUrl = flags.staging ? BASE_API_URL_STAGING : flags.endpoint;
   await axios({
-    url,
+    url: `${baseApiUrl}/app/plugin`,
     method: "put",
     data: form,
     headers: {
@@ -76,50 +75,6 @@ const deploy = async (flags: DeployFlags) => {
   })
     .then(() => console.log("done"))
     .catch(logRequestError);
-};
-
-export const mergeProtoImports = (
-  proto: string,
-  protoPath: string,
-  excludeSdk = true,
-  excludeSyntaxDefinition = true,
-  n = 0,
-): string => {
-  let mergedManifestString = "";
-  const lines = proto.split("\n");
-  for (let line of lines) {
-    line = line.trim();
-    const isSyntaxLine = line.startsWith("syntax");
-    if (isSyntaxLine && (excludeSyntaxDefinition || n > 1)) {
-      continue;
-    }
-    const isImportLine = line.startsWith("import");
-    if (!isImportLine) {
-      mergedManifestString = `${mergedManifestString}\n${line}`;
-      continue;
-    }
-    const importLine = line.replaceAll("'", '"');
-    const pathStart = importLine.indexOf('"') + 1;
-    const pathEnd = importLine.lastIndexOf('"');
-    const pathRelative = importLine.substring(pathStart, pathEnd);
-    const isSdkImport = pathRelative.startsWith("node_modules/@asterai/sdk");
-    if (isSdkImport && excludeSdk) {
-      // Asterai protobuf definitions should not be uploaded
-      // as part of the plugin manifest.
-      continue;
-    }
-    const pathAbsolute = path.join(path.dirname(protoPath), pathRelative);
-    const importProto = fs.readFileSync(pathAbsolute, { encoding: "utf8" });
-    const importProtoMerged = mergeProtoImports(
-      importProto,
-      pathAbsolute,
-      excludeSdk,
-      excludeSyntaxDefinition,
-      n + 1,
-    );
-    mergedManifestString = `${mergedManifestString}\n${importProtoMerged}`;
-  }
-  return mergedManifestString.trim();
 };
 
 const logRequestError = (e: any) => {
