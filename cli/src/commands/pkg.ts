@@ -61,11 +61,10 @@ export const pkg = async (
   }
   const baseDir = path.dirname(witPath);
   const outputFile = path.join(baseDir, flags.output);
-  const url = ``;
   const form = new FormData();
   form.append("package.wit", await fs.readFile(witPath));
   const response = await axios({
-    url,
+    url: `${flags.endpoint}/v1/pkg`,
     method: "post",
     data: form,
     headers: {
