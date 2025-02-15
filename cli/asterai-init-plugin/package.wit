@@ -1,4 +1,4 @@
-package asterai:math;
+package example:math@0.1.0;
 
 world plugin {
   use asterai:host/context@0.1.0.{plugin-context};
