@@ -4,12 +4,12 @@ import path from "path";
 import FormData from "form-data";
 import axios from "axios";
 import { getConfigValue } from "../config.js";
-import { build, BuildOutput } from "./build.js";
+import { pkg, PkgOutput } from "./pkg.js";
 
 const PRODUCTION_ENDPOINT = "https://api.asterai.io/app/plugin";
 const STAGING_ENDPOINT = "https://staging.api.asterai.io/app/plugin";
 
-type DeployArgs = BuildOutput;
+type DeployArgs = PkgOutput;
 
 type DeployFlags = {
   app: string;
@@ -61,7 +61,7 @@ export default class Deploy extends Command {
       // Deploy the wasm module passed in the input.
       const deployArgs: DeployArgs = {
         outputFile: flags.wasm,
-        manifestPath: flags.manifest,
+        witPath: flags.manifest,
       };
       await deploy(deployArgs, flags);
       return;
@@ -71,7 +71,7 @@ export default class Deploy extends Command {
     const buildArgs = {
       input: flags.plugin,
     };
-    const output = await build(buildArgs, flags);
+    const output = await pkg(buildArgs, flags);
     await deploy(output, flags);
   }
 }
@@ -80,13 +80,10 @@ const deploy = async (args: DeployArgs, flags: DeployFlags) => {
   const form = new FormData();
   form.append("app_id", flags.app);
   form.append("module", fs.readFileSync(args.outputFile));
-  const manifestString = fs.readFileSync(args.manifestPath, {
+  const manifestString = fs.readFileSync(args.witPath, {
     encoding: "utf8",
   });
-  const mergedManifestString = mergeProtoImports(
-    manifestString,
-    args.manifestPath,
-  );
+  const mergedManifestString = mergeProtoImports(manifestString, args.witPath);
   form.append("manifest", mergedManifestString);
   const url = flags.staging ? STAGING_ENDPOINT : flags.endpoint;
   await axios({

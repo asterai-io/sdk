@@ -6,49 +6,49 @@ import Mustache from "mustache";
 import protobuf, { Service } from "protobufjs";
 import { mergeProtoImports } from "./deploy.js";
 
-export type BuildArgs = {
+export type PkgArgs = {
   input: string;
 };
 
-export type BuildFlags = {
-  manifest: string;
+export type PkgFlags = {
+  wit: string;
 };
 
-export type BuildOutput = {
+export type PkgOutput = {
   outputFile: string;
-  manifestPath: string;
+  witPath: string;
 };
 
-export default class Build extends Command {
+export default class Pkg extends Command {
   static args = {
     input: Args.string({
-      default: "plugin.ts",
+      default: "package.wit",
     }),
   };
 
-  static description = "compiles the plugin";
+  static description = "bundles the WIT into a WASM binary package";
 
   static examples = [`<%= config.bin %> <%= command.id %>`];
 
   static flags = {
-    manifest: Flags.string({
-      char: "m",
-      description: "manifest path",
-      default: "plugin.asterai.proto",
+    wit: Flags.string({
+      char: "w",
+      description: "path to the WIT file",
+      default: "package.wit",
     }),
   };
 
   async run(): Promise<void> {
-    const { args, flags } = await this.parse(Build);
-    await build(args, flags);
+    const { args, flags } = await this.parse(Pkg);
+    await pkg(args, flags);
   }
 }
 
-export const build = async (
-  args: BuildArgs,
-  flags: BuildFlags,
-): Promise<BuildOutput> => {
-  const manifestPath = path.resolve(flags.manifest);
+export const pkg = async (
+  args: PkgArgs,
+  flags: PkgFlags,
+): Promise<PkgOutput> => {
+  const manifestPath = path.resolve(flags.wit);
   const inputFile = path.resolve(args.input);
   if (!fs.existsSync(inputFile)) {
     throw new Error(`input file not found (${args.input})`);
@@ -64,10 +64,6 @@ export const build = async (
   const proto = fs.readFileSync(manifestPath, { encoding: "utf8" });
   const functionDescriptors = getPluginFunctionDescriptors(proto, manifestPath);
   const inputFileContent = fs.readFileSync(inputFile, { encoding: "utf8" });
-  assertPluginCodeHasAllFunctionsFromManifest(
-    inputFileContent,
-    functionDescriptors,
-  );
   const entryPointCode = generateEntryPointCode(functionDescriptors);
   const mergedPluginCode = mergeInputPluginCodeWithEntrypoint(
     inputFileContent,
@@ -91,7 +87,7 @@ export const build = async (
     fs.unlinkSync(mergedTempFilePath);
   }
   return {
-    manifestPath,
+    witPath: manifestPath,
     outputFile,
   };
 };
@@ -180,27 +176,4 @@ const writeMergedPluginCodeTempFile = (
   const tempFilePath = path.join(inputFileDir, tempFileName);
   fs.writeFileSync(tempFilePath, source, { encoding: "utf8" });
   return tempFilePath;
-};
-
-/**
- * Throw an error if the plugin WASM source is missing a function from
- * the manifest.
- * The only purpose of this function is to let the user know about
- * the issue in a direct way.
- */
-const assertPluginCodeHasAllFunctionsFromManifest = (
-  source: string,
-  functionDescriptors: PluginFunctionDescriptor[],
-) => {
-  for (const functionDescriptor of functionDescriptors) {
-    const includesFunction = source.includes(
-      `function ${functionDescriptor.functionName}`,
-    );
-    if (!includesFunction) {
-      throw new Error(
-        `function "${functionDescriptor.functionName}" was defined in plugin ` +
-          "manifest (.proto file) but is missing from plugin code",
-      );
-    }
-  }
 };
