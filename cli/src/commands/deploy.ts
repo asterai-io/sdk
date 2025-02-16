@@ -4,11 +4,15 @@ import FormData from "form-data";
 import axios from "axios";
 import { getConfigValue } from "../config.js";
 import { BASE_API_URL, BASE_API_URL_STAGING } from "../const.js";
+import path from "path";
+
+// If the input file doesn't exist, try looking into this dir.
+const RETRY_FIND_FILE_DIR = "build/";
 
 type DeployFlags = {
   plugin: string;
   pkg: string;
-  app?: string;
+  agent?: string;
   endpoint: string;
   staging: boolean;
 };
@@ -23,15 +27,10 @@ export default class Deploy extends Command {
   ];
 
   static flags = {
-    app: Flags.string({
+    agent: Flags.string({
       char: "a",
-      description: "app ID to immediately configure this plugin with",
+      description: "agent ID to immediately activate this plugin for",
       required: false,
-    }),
-    manifest: Flags.string({
-      char: "m",
-      description: "manifest path",
-      default: "plugin.asterai.proto",
     }),
     endpoint: Flags.string({
       char: "e",
@@ -58,14 +57,16 @@ export default class Deploy extends Command {
 
 const deploy = async (flags: DeployFlags) => {
   const form = new FormData();
-  if (flags.app) {
-    form.append("app_id", flags.app);
+  if (flags.agent) {
+    form.append("agent_id", flags.agent);
   }
-  form.append("plugin.wasm", fs.readFileSync(flags.plugin));
-  form.append("package.wasm", fs.readFileSync(flags.pkg));
+  const plugin = readFile(flags.plugin);
+  const pkg = readFile(flags.pkg);
+  form.append("plugin.wasm", plugin);
+  form.append("package.wasm", pkg);
   const baseApiUrl = flags.staging ? BASE_API_URL_STAGING : flags.endpoint;
   await axios({
-    url: `${baseApiUrl}/app/plugin`,
+    url: `${baseApiUrl}/v1/plugin`,
     method: "put",
     data: form,
     headers: {
@@ -80,4 +81,15 @@ const deploy = async (flags: DeployFlags) => {
 const logRequestError = (e: any) => {
   const info = e.response?.data ?? e;
   console.log("request error:", info);
+};
+
+const readFile = (relativePath: string): Buffer => {
+  if (fs.existsSync(relativePath)) {
+    return fs.readFileSync(relativePath);
+  }
+  const retryPath = path.join(RETRY_FIND_FILE_DIR, relativePath);
+  if (fs.existsSync(retryPath)) {
+    return fs.readFileSync(retryPath);
+  }
+  throw new Error(`file not found: ${relativePath}`);
 };
