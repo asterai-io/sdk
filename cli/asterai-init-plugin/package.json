@@ -6,7 +6,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "auth": "asterai auth",
-    "pkg": "asterai pkg -o build/package.wasm",
+    "pkg": "mkdirp build && asterai pkg -o build/package.wasm",
     "typegen": "jco types build/package.full.wit -n plugin -o typegen/",
     "build": "tsc && wasm-tools component wit ./build/package.wasm -o build/package.full.wit && jco componentize build/plugin.js -w build/package.full.wit -n plugin -o build/plugin.wasm",
     "deploy": "asterai deploy"
@@ -16,6 +16,7 @@
     "@asterai/cli": "latest",
     "@asterai/sdk": "latest",
     "@bytecodealliance/jco": "^1.9.1",
+    "mkdirp": "^3.0.1",
     "typescript": "^5.7.3"
   }
 }
