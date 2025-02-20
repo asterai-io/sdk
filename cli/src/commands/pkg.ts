@@ -120,8 +120,9 @@ const validateResponseStatus = (status: number): void => {
 };
 
 const catchAxiosError = (error: any) => {
-  if (axios.isAxiosError(error) && error.response?.data) {
-    const errorMessage = error.response.data.toString().replace(/\\n/g, "\n");
+  const data = error.response?.data?.toString() ?? "";
+  if (axios.isAxiosError(error) && data.length > 0) {
+    const errorMessage = data.replace(/\\n/g, "\n");
     throw new Error(`Request failed: ${errorMessage}`);
   }
   throw new Error("Request failed");
