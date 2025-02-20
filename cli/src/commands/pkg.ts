@@ -14,6 +14,7 @@ export type PkgArgs = {
 export type PkgFlags = {
   endpoint: string;
   output: string;
+  wit?: string;
 };
 
 export type PkgOutput = {
@@ -24,8 +25,8 @@ export type PkgOutput = {
 export default class Pkg extends Command {
   static args = {
     input: Args.string({
-      default: "package.wit",
-      description: "path to the WIT file",
+      default: "plugin.wit",
+      description: "path to the plugin's WIT file",
     }),
   };
 
@@ -34,6 +35,11 @@ export default class Pkg extends Command {
       char: "o",
       default: "package.wasm",
       description: "output file name for the binary WASM package",
+    }),
+    wit: Flags.string({
+      char: "w",
+      default: "package.wit",
+      description: "output package converted to the WIT format",
     }),
     endpoint: Flags.string({
       char: "e",
@@ -72,15 +78,51 @@ export const pkg = async (
       ...form.getHeaders(),
     },
     responseType: "arraybuffer",
-  });
-  if (response.status < 200 || response.status >= 300) {
-    throw new Error("request failed");
-  }
+  }).catch(catchAxiosError);
+  validateResponseStatus(response.status);
   await fs.writeFile(outputFile, Buffer.from(response.data), {
     encoding: "binary",
   });
+  if (flags.wit) {
+    await wasm2wit(flags.endpoint, outputFile, path.join(baseDir, flags.wit));
+  }
   return {
     outputFile,
     witPath,
   };
+};
+
+const wasm2wit = async (
+  endpoint: string,
+  inputFilePath: string,
+  outputFilePath: string,
+) => {
+  const form = new FormData();
+  form.append("package.wasm", await fs.readFile(inputFilePath));
+  const response = await axios({
+    url: `${endpoint}/v1/wasm2wit`,
+    method: "post",
+    data: form,
+    headers: {
+      Authorization: getConfigValue("key"),
+      ...form.getHeaders(),
+    },
+    responseType: "text",
+  });
+  validateResponseStatus(response.status);
+  await fs.writeFile(outputFilePath, response.data, { encoding: "utf8" });
+};
+
+const validateResponseStatus = (status: number): void => {
+  if (status < 200 || status >= 300) {
+    throw new Error("request failed");
+  }
+};
+
+const catchAxiosError = (error: any) => {
+  if (axios.isAxiosError(error) && error.response?.data) {
+    const errorMessage = error.response.data.toString().replace(/\\n/g, "\n");
+    throw new Error(`Request failed: ${errorMessage}`);
+  }
+  throw new Error("Request failed");
 };
