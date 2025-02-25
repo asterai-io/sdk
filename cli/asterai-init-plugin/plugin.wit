@@ -1,0 +1,12 @@
+package example:math@0.1.0;
+
+world plugin {
+  import asterai:host/api@0.1.0;
+
+  export add: func(input: binary-operation-input) -> s32;
+
+  record binary-operation-input {
+    a: f64,
+    b: f64,
+  }
+}

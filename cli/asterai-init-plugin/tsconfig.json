@@ -1,4 +1,11 @@
 {
-  "extends": "assemblyscript/std/assembly.json",
-  "include": ["./**/*.ts"]
+  "include": ["./**/*.ts"],
+  "compilerOptions": {
+    "outDir": "build",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "paths": {
+      "asterai:host/api@0.1.0": ["./generated/interfaces/asterai-host-api.d.ts"]
+    }
+  }
 }
