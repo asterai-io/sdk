@@ -36,7 +36,9 @@
     "/bin",
     "/dist",
     "/oclif.manifest.json",
-    "/init"
+    "/init",
+    "!/init/rust/target",
+    "!/init/rust/Cargo.lock"
   ],
   "oclif": {
     "bin": "asterai",
