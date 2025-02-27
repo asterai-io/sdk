@@ -5,7 +5,7 @@ import url from "url";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
-const SOURCE_DIR = path.join(__dirname, "../../asterai-init-plugin");
+const SOURCE_DIR = path.join(__dirname, "../../init/typescript");
 
 export default class Codegen extends Command {
   static args = {
