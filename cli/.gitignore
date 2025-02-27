@@ -8,3 +8,4 @@
 oclif.manifest.json
 yarn.lock
 package-lock.json
+init/rust/Cargo.lock
