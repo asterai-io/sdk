@@ -36,7 +36,7 @@
     "/bin",
     "/dist",
     "/oclif.manifest.json",
-    "/init/typescript"
+    "/init"
   ],
   "oclif": {
     "bin": "asterai",
