@@ -22,7 +22,7 @@ $ npm install -g @asterai/cli
 $ asterai COMMAND
 running command...
 $ asterai (--version)
-@asterai/cli/0.6.0 darwin-arm64 node-v20.12.2
+@asterai/cli/0.6.1 linux-x64 node-v20.12.2
 $ asterai --help [COMMAND]
 USAGE
   $ asterai COMMAND
@@ -57,7 +57,7 @@ EXAMPLES
   $ asterai auth
 ```
 
-_See code: [src/commands/auth.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.6.0/src/commands/auth.ts)_
+_See code: [src/commands/auth.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.6.1/src/commands/auth.ts)_
 
 ## `asterai deploy`
 
@@ -81,7 +81,7 @@ EXAMPLES
   $ asterai deploy --app 66a46b12-b1a7-4b72-a64a-0e4fe21902b6
 ```
 
-_See code: [src/commands/deploy.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.6.0/src/commands/deploy.ts)_
+_See code: [src/commands/deploy.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.6.1/src/commands/deploy.ts)_
 
 ## `asterai help [COMMAND]`
 
@@ -101,7 +101,7 @@ DESCRIPTION
   Display help for asterai.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.2.0/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.0.22/src/commands/help.ts)_
 
 ## `asterai init [OUTDIR]`
 
@@ -122,7 +122,7 @@ EXAMPLES
   $ asterai init project-name
 ```
 
-_See code: [src/commands/init.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.6.0/src/commands/init.ts)_
+_See code: [src/commands/init.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.6.1/src/commands/init.ts)_
 
 ## `asterai pkg [INPUT]`
 
@@ -147,7 +147,7 @@ EXAMPLES
   $ asterai pkg
 ```
 
-_See code: [src/commands/pkg.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.6.0/src/commands/pkg.ts)_
+_See code: [src/commands/pkg.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.6.1/src/commands/pkg.ts)_
 
 ## `asterai query`
 
@@ -170,6 +170,6 @@ EXAMPLES
   $ asterai query
 ```
 
-_See code: [src/commands/query.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.6.0/src/commands/query.ts)_
+_See code: [src/commands/query.ts](https://github.com/asterai-io/asterai-sdk/blob/v0.6.1/src/commands/query.ts)_
 
 <!-- commandsstop -->
