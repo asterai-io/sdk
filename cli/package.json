@@ -37,6 +37,8 @@
     "/dist",
     "/oclif.manifest.json",
     "/init",
+    "/init/rust/.gitignore",
+    "/init/typescript/.gitignore",
     "!/init/rust/target",
     "!/init/rust/Cargo.lock"
   ],
