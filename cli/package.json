@@ -40,7 +40,11 @@
     "/init/rust/.gitignore",
     "/init/typescript/.gitignore",
     "!/init/rust/target",
-    "!/init/rust/Cargo.lock"
+    "!/init/rust/Cargo.lock",
+    "!/init/typescript/build",
+    "!/init/typescript/node_modules",
+    "!/init/typescript/generated",
+    "!/init/typescript/pnpm-lock.yaml"
   ],
   "oclif": {
     "bin": "asterai",
